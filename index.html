@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Display</title>
+</head>
+<body>
+    <h1>CSV Data Display</h1>
+    <div id="data-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var csvUrl = 'https://110316112.github.io/-/pa.csv';
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var csvData = xhr.responseText;
+                        var parsedData = parseCSV(csvData);
+                        displayData(parsedData);
+                    } else {
+                        console.error('Failed to fetch CSV data');
+                    }
+                }
+            };
+            xhr.open('GET', csvUrl, true);
+            xhr.send();
+        });
+
+        function parseCSV(csvData) {
+            var lines = csvData.split('\n');
+            var result = [];
+            var headers = lines[0].split(',');
+
+            for (var i = 1; i < lines.length; i++) {
+                var obj = {};
+                var currentLine = lines[i].split(',');
+
+                for (var j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentLine[j];
+                }
+
+                result.push(obj);
+            }
+
+            return result;
+        }
+
+        function displayData(data) {
+            var container = document.getElementById('data-container');
+            var table = document.createElement('table');
+            var headers = Object.keys(data[0]);
+
+            var headerRow = document.createElement('tr');
+            headers.forEach(function(header) {
+                var th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            data.forEach(function(rowData) {
+                var row = document.createElement('tr');
+                headers.forEach(function(header) {
+                    var cell = document.createElement('td');
+                    cell.textContent = rowData[header];
+                    row.appendChild(cell);
+                });
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        }
+    </script>
+</body>
+</html>
